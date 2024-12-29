@@ -23,9 +23,9 @@ pip install -r requirements.txt
 ```
 
 - 執行，並後面代上spotify playlist 的 ID
-(https://open.spotify.com/playlist/22XNgsUg5DFG9nqGAYtE0B)
+(https://open.spotify.com/playlist/22XNgsUg5DFG9nqGAYtE0B)，以及想在YT建立的新播放清單名字
 ```
-python convert_playlist.py 22XNgsUg5DFG9nqGAYtE0B
+python convert_playlist.py 22XNgsUg5DFG9nqGAYtE0B New_Playlist_Name
 ```
 - 複製播放清單完成
 
@@ -35,3 +35,4 @@ python convert_playlist.py 22XNgsUg5DFG9nqGAYtE0B
 # 參考
 - [spotipy-Github](https://github.com/spotipy-dev/spotipy/tree/master)
 - [spotipy-DOC](https://spotipy.readthedocs.io/en/2.24.0/)
+- [Python - 數位行銷分析與 Youtube API 教學](https://ithelp.ithome.com.tw/users/20140740/ironman/4250?page=1)
