@@ -1,6 +1,7 @@
 # pylint: disable=line-too-long
 
 import os
+import time
 import argparse
 import requests
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -9,6 +10,7 @@ import spotipy
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 import googleapiclient.errors
+from googleapiclient.errors import HttpError
 
 class ConvertPlaylist():
 
@@ -48,12 +50,6 @@ class ConvertPlaylist():
                      'artist': main_artist}
             self.playlist['tracks'].append(track)
 
-    def create_spotify_playlist(self, title, description=""):
-        pass
-
-    def add_song_to_spotify_playlist(self):
-        pass
-
     def get_youtube_client(self):
         os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
@@ -61,7 +57,8 @@ class ConvertPlaylist():
         api_version = "v3"
         client_secrets_file = "client_secret.json"
 
-        scopes = ["https://www.googleapis.com/auth/youtubepartner"]
+        # scopes = ["https://www.googleapis.com/auth/youtubepartner"]
+        scopes = ["https://www.googleapis.com/auth/youtube.force-ssl"]
 
         flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(
             client_secrets_file, scopes)
@@ -81,48 +78,59 @@ class ConvertPlaylist():
 
                 video_title = item['snippet']['title']
                 video_id = item['id']['videoId']
+                print(video_title)
                 break
 
         return video_id
 
-    def get_youtube_playlist(self):
-        pass
-
     def create_youtube_playlist(self, title, description=""):
-        request = self.youtube.playlists().insert(
-            part="snippet",
-            body={
-                "snippet": {
-                    "title": title,
-                    "description": description
-                }
-            }
-        )
-        response = request.execute()
-
-        playlist_id = response['id']
-        playlist_title = response['snippet']['localized']['title']
-        print('-' * 30)
-        print(playlist_title)
-        print("https://www.youtube.com/playlist?list={}".format(playlist_id))
-        print('-' * 30)
-
-        return playlist_id
-
-    def add_video_to_youtube_playlist(self, video_id, playlist_id):
-        request = self.youtube.playlistItems().insert(
-            part="snippet",
-            body={
-                'snippet': {
-                    'playlistId': playlist_id,
-                    'resourceId': {
-                        'kind': 'youtube#video',
-                        'videoId': video_id
+        try:
+            request = self.youtube.playlists().insert(
+                part="snippet",
+                body={
+                    "snippet": {
+                        "title": title,
+                        "description": description
                     }
                 }
-            }
-        )
-        request.execute()
+            )
+            response = request.execute()
+
+            playlist_id = response['id']
+            playlist_title = response['snippet']['localized']['title']
+            print('-' * 30)
+            print(playlist_title)
+            print("https://www.youtube.com/playlist?list={}".format(playlist_id))
+            print('-' * 30)
+
+            return playlist_id
+        except HttpError as err:
+            print("ERROR CODE : ",err.resp.status)
+            if err.resp.status in [403, 500, 503]:
+                time.sleep(5)
+            else: raise
+
+
+    def add_video_to_youtube_playlist(self, video_id, playlist_id):
+        try:
+            request = self.youtube.playlistItems().insert(
+                part="snippet",
+                body={
+                    'snippet': {
+                        'playlistId': playlist_id,
+                        'resourceId': {
+                            'kind': 'youtube#video',
+                            'videoId': video_id
+                        }
+                    }
+                }
+            )
+            request.execute()
+        except HttpError as err:
+            print("ERROR CODE : ",err.resp.status)
+            if err.resp.status in [409, 500, 503]:
+                time.sleep(5)
+            else: raise
 
     def convert(self, spotify_uri, playlist_name):
         self.get_spotify_playlist(spotify_uri)
@@ -130,7 +138,6 @@ class ConvertPlaylist():
         for track in self.playlist['tracks']:
             video_id = self.get_youtube_video(track)
             self.add_video_to_youtube_playlist(video_id, playlist_id)
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -140,3 +147,4 @@ if __name__ == '__main__':
 
     cp = ConvertPlaylist()
     cp.convert(args.spotify_uri, args.playlist_name)
+    print("Finished")
