@@ -1,4 +1,4 @@
-# Spotify To YouTube
+# Spotify/KKBOX To YouTube
 
 - TODO : 亂亂寫，架構未整理，但功能正常
 
@@ -26,6 +26,7 @@ pip install -r requirements.txt
 (https://open.spotify.com/playlist/22XNgsUg5DFG9nqGAYtE0B)，以及想在YT建立的新播放清單名字
 ```
 python convert_playlist.py 22XNgsUg5DFG9nqGAYtE0B New_Playlist_Name
+python kkbox_to_yt.py LZPhK2EyYzN15dU-PT New_Playlist_Name
 ```
 - 複製播放清單完成
 
