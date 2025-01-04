@@ -16,8 +16,8 @@ playlist = {'tracks': []}
 
 
 def get_kkbox_playlist_tracks(kkbox_playlist_id):
-    # url = "https://api.kkbox.com/v1.1/charts/{}/tracks?territory=TW".format(kkbox_playlist_id)
-    url = "https://api.kkbox.com/v1.1/charts/{}/tracks?territory=TW&offset=0&limit=5".format(kkbox_playlist_id)
+    url = "https://api.kkbox.com/v1.1/charts/{}/tracks?territory=TW".format(kkbox_playlist_id)
+    # url = "https://api.kkbox.com/v1.1/charts/{}/tracks?territory=TW&offset=0&limit=5".format(kkbox_playlist_id)
     auth = "Bearer {}".format(token)
     headers = {
         'accept': "application/json",
